@@ -2,61 +2,19 @@ const fs = require("fs")
 
 const Tour = require("../models/tourModel")
 
-const createTourModel = async (req, res) => {
-  try {
-    const newTour = await Tour.create(req.body)
-    res.status(201).json({
-      status: "success",
-      data: {
-        tour: newTour,
-      },
-    })
-  } catch (err) {
-    console.log(err)
-    res.status(400).json({
+const checkId = (req, res, next, val) => {
+  console.log(val * 1)
+  const tour = tours.find(
+    (el) => el.id === val * 1
+  )
+
+  if (!tour) {
+    return res.status(404).json({
       status: "failed",
-      message: err.message,
+      message: `data with ${val} this not found`,
     })
   }
-}
-
-const getAllTours = async (req, res) => {
-  try {
-    const tours = await Tour.find()
-    res.status(200).json({
-      status: "success",
-      requestTime: req.requestTime,
-      length: tours.length,
-      data: {
-        tours,
-      },
-    })
-  } catch (err) {
-    res.status(400).json({
-      status: "failed",
-      message: err.message,
-    })
-  }
-}
-
-const getTourById = async (req, res) => {
-  try {
-    const tour = await Tour.findById(
-      req.params.id
-    )
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        tour,
-      },
-    })
-  } catch (err) {
-    res.status(400).json({
-      status: "success",
-      message: err.message,
-    })
-  }
+  next()
 }
 
 const checkBody = (req, res, next) => {
@@ -68,6 +26,7 @@ const checkBody = (req, res, next) => {
   }
   next()
 }
+
 const createTour = (req, res) => {
   console.log(req.body.role)
   // generate id untuk data baru dari request api kita
@@ -146,13 +105,122 @@ const removeTour = (req, res) => {
   )
 }
 
+const createTourModel = async (req, res) => {
+  try {
+    const newTour = await Tour.create(req.body)
+    res.status(201).json({
+      status: "success",
+      data: {
+        tour: newTour,
+      },
+    })
+  } catch (err) {
+    console.log(err)
+    res.status(400).json({
+      status: "failed",
+      message: err.message,
+    })
+  }
+}
+
+const getAllToursModel = async (req, res) => {
+  try {
+    const tours = await Tour.find()
+    res.status(200).json({
+      status: "success",
+      requestTime: req.requestTime,
+      length: tours.length,
+      data: {
+        tours,
+      },
+    })
+  } catch (err) {
+    res.status(400).json({
+      status: "failed",
+      message: err.message,
+    })
+  }
+}
+
+const getTourByIdModel = async (req, res) => {
+  try {
+    const tour = await Tour.findById(
+      req.params.id
+    )
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        tour,
+      },
+    })
+  } catch (err) {
+    res.status(400).json({
+      status: "success",
+      message: err.message,
+    })
+  }
+}
+
+const editTourModel = async (req, res) => {
+  try {
+    const id = req.params.id
+    const updateTour =
+      await Tour.findByIdAndUpdate(id, req.body, {
+        new: true,
+      })
+    if (!updateTour) {
+      res.status(400).json({
+        status: 400,
+        message: "Id not found",
+      })
+    }
+    res.status(201).json({
+      status: "success",
+      data: {
+        tour: updateTour,
+      },
+    })
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      message: err.message,
+    })
+  }
+}
+
+const removeTourModel = async (req, res) => {
+  try {
+    const id = req.params.id
+    const tour = await Tour.findByIdAndDelete(id)
+    if (!tour) {
+      return res.status(201).json({
+        status: "failed",
+        message: "id not found",
+        data: null,
+      })
+    }
+    res.status(200).json({
+      status: "success",
+      message: `success delete id ${id}`,
+      data: null,
+    })
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      message: err.message,
+    })
+  }
+}
 module.exports = {
-  getAllTours,
-  getTourById,
+  getAllToursModel,
+  getTourByIdModel,
   createTour,
   editTour,
   removeTour,
-  // checkId,
+  checkId,
   checkBody,
   createTourModel,
+  editTourModel,
+  removeTourModel,
 }

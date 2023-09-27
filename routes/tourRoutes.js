@@ -7,7 +7,7 @@ const router = express.Router()
 
 router
   .route("/")
-  .get(toursController.getAllTours)
+  .get(toursController.getAllToursModel)
   .post(
     toursController.checkBody,
     toursController.createTour
@@ -19,8 +19,8 @@ router
 
 router
   .route("/:id")
-  .get(toursController.getTourById)
-  .patch(toursController.editTour)
-  .delete(toursController.removeTour)
+  .get(toursController.getTourByIdModel)
+  .patch(toursController.editTourModel)
+  .delete(toursController.removeTourModel)
 
 module.exports = router
